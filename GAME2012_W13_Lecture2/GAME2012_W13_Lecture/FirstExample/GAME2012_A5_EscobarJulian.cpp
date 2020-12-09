@@ -140,11 +140,11 @@ void timer(int);
 
 void resetView()
 {
-	position = glm::vec3(5.0f, 3.0f, 10.0f);
+	position = glm::vec3(10.5f, 3.0f, -50.0f);
 	frontVec = glm::vec3(0.0f, 0.0f, -1.0f);
 	worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0.0f;
-	yaw = -90.0f;
+	yaw = 90.0f;
 	// View will now get set only in transformObject
 }
 

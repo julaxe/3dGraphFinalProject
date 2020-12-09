@@ -409,7 +409,7 @@ struct Prism : public Shape
 		shape_indices.push_back(0);
 		shape_indices.push_back(1);
 		shape_indices.push_back(sides);
-		for (int i = 0; i < shape_vertices.size(); i += 5)
+		for (int i = 0; i < shape_vertices.size(); i += 3)
 		{
 			shape_uvs.push_back(shape_vertices[i]); // No texture for grid so value doesn't matter.
 			shape_uvs.push_back(shape_vertices[i+1]);
