@@ -123,7 +123,7 @@ GLfloat pitch, yaw;
 int lastX, lastY;
 
 // Texture variables.
-GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx;
+GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx, roofTileTx,testeTx;
 GLint width, height, bitDepth;
 
 // Light variables.
@@ -299,6 +299,34 @@ void init(void)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image6);
 
+	unsigned char* image7 = stbi_load("Assets/roofTile.jpg", &width, &height, &bitDepth, 0);
+	if (!image7) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &roofTileTx);
+	glBindTexture(GL_TEXTURE_2D, roofTileTx);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image7);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image7);
+
+	unsigned char* image8 = stbi_load("Assets/Teste02.jpg", &width, &height, &bitDepth, 0);
+	if (!image8) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &testeTx);
+	glBindTexture(GL_TEXTURE_2D, testeTx);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image8);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image8);
+
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
 	// Setting ambient Light.
@@ -450,12 +478,22 @@ void VerticalWall(glm::vec2 Pos) {
 void Turret(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(3.0f, 4.0f, 3.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	transformObject(glm::vec3(2.0f, 4.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(Pos.x+0.5, 0.0f, Pos.y+0.5));
 	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
-	glBindTexture(GL_TEXTURE_2D, wallTx);
+	glBindTexture(GL_TEXTURE_2D, testeTx);
+	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(3.0f, 3.0f, 3.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 4.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, roofTileTx);
 	g_cone.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(4.0f, 4.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 4.0f, Pos.y));
+	transformObject(glm::vec3(3.0f, 4.0f, 3.0f), X_AXIS, 0.0f, glm::vec3(Pos.x-0.0, 7.0f, Pos.y-0.0));
+	glDrawElements(GL_TRIANGLES, g_cone.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, roofTileTx);
+	g_cone.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(4.0f, 2.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(Pos.x - 0.5, 7.0f, Pos.y - 0.5));
 	glDrawElements(GL_TRIANGLES, g_cone.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
