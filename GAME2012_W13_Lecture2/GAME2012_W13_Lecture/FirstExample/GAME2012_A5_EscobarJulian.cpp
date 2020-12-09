@@ -123,7 +123,8 @@ GLfloat pitch, yaw;
 int lastX, lastY;
 
 // Texture variables.
-GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx, roofTileTx,testeTx;
+GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx, roofTileTx,testeTx, doorTx;
+
 GLint width, height, bitDepth;
 
 // Light variables.
@@ -299,10 +300,12 @@ void init(void)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image6);
 
+
 	unsigned char* image7 = stbi_load("Assets/roofTile.jpg", &width, &height, &bitDepth, 0);
 	if (!image7) cout << "Unable to load file!" << endl;
 
 	glGenTextures(1, &roofTileTx);
+	
 	glBindTexture(GL_TEXTURE_2D, roofTileTx);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image7);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -313,11 +316,12 @@ void init(void)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image7);
 
-	unsigned char* image8 = stbi_load("Assets/Teste02.jpg", &width, &height, &bitDepth, 0);
+	unsigned char* image8 = stbi_load("Assets/door2.jpg", &width, &height, &bitDepth, 0);
 	if (!image8) cout << "Unable to load file!" << endl;
 
-	glGenTextures(1, &testeTx);
-	glBindTexture(GL_TEXTURE_2D, testeTx);
+	glGenTextures(1, &doorTx);
+	glBindTexture(GL_TEXTURE_2D, doorTx);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image8);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -326,6 +330,21 @@ void init(void)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image8);
+
+
+	unsigned char* image9 = stbi_load("Assets/Teste02.jpg", &width, &height, &bitDepth, 0);
+	if (!image9) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &testeTx);
+	glBindTexture(GL_TEXTURE_2D, testeTx);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image9);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image9);
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
@@ -438,6 +457,20 @@ void MazeWall(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, bushTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(1.0f, 2.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
+void DoorLeft(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, doorTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(3.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
+void DoorRight(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, doorTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(3.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
@@ -570,7 +603,13 @@ void display(void)
 				break;
 			case 'M':
 				MazeWall(tileMap[x][y].Position);
-				break;	
+				break;
+			case 'L':
+				DoorLeft(tileMap[x][y].Position);
+				break;
+			case 'R':
+				DoorRight(tileMap[x][y].Position);
+				break;		
 			default:
 				break;
 			}
