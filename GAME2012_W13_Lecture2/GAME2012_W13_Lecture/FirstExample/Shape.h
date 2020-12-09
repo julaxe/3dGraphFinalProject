@@ -140,9 +140,9 @@ struct Plane : public Shape // Vertical plane of 1x1 units across.
 	}
 };
 
-struct Grid : public Shape // Flat grid on ground. Starts at 0,0,0 and increases into positive.
+struct GridP : public Shape // Flat grid on ground. Starts at 0,0,0 and increases into positive.
 {
-	Grid(int quads, int scale = 1)
+	GridP(int quads, int scale = 1)
 	{
 		for (int row = 0; row <= quads; row++)
 		{

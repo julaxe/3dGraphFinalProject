@@ -21,7 +21,7 @@
     <ClCompile Include="01_Lights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GAME2012_A5_EscobarJulian.cpp">
+    <ClCompile Include="GAME2012_A5_Escobar_Krespi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
