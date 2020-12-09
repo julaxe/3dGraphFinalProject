@@ -108,7 +108,7 @@ struct Cube2 : public Shape
 GLuint vao, ibo, points_vbo, colors_vbo, uv_vbo, normals_vbo, modelID, viewID, projID;
 GLuint program;
 
-int const numberOfTiles = 5;
+int const numberOfTiles = 20;
 Elements tileMap[numberOfTiles][numberOfTiles];
 // Matrices.
 glm::mat4 View, Projection;
@@ -130,8 +130,8 @@ GLint width, height, bitDepth;
 AmbientLight aLight(glm::vec3(1.0f, 1.0f, 1.0f),	// Ambient colour.
 	1.0f);							// Ambient strength.
 
-SpotLight sLight(glm::vec3(5.0f, 10.0f, -5.0f),	// Position.
-	glm::vec3(1.0f, 0.0f, 0.0f),	// Diffuse colour.
+SpotLight sLight(glm::vec3(10.0f, 50.0f, -10.0f),	// Position.
+	glm::vec3(1.0f, 1.0f, 1.0f),	// Diffuse colour.
 	1.0f,							// Diffuse strength.
 	glm::vec3(0.0f, -1.0f, 0.0f),  // Direction.
 	15.0f);
@@ -152,13 +152,13 @@ void resetView()
 Cube g_cube(1);
 Cube2 g_cubeSmall;
 Prism g_prism(24);
-Grid g_grid(10,3); // New UV scale parameter. Works with texture now.
+Grid g_grid(20,4); // New UV scale parameter. Works with texture now.
 Cone g_cone(24);
 
 
 void CreateTileMap()
 {
-	fstream fin("tilemap.txt", fstream::in);
+	fstream fin("TileMap-01.txt", fstream::in);
 	int x = 0;
 	int y = 0;
 	float posX = 0.0f;
@@ -166,7 +166,7 @@ void CreateTileMap()
 	char ch;
 	while(fin >> noskipws >> ch)
 	{
-		if(ch == '\n')
+		if(ch == '\n') // go to the next line so next row
 		{
 			x = 0;
 			posX = 0.0f;
@@ -178,7 +178,7 @@ void CreateTileMap()
 		if(x < numberOfTiles && y < numberOfTiles)
 			tileMap[x][y] = Elements(ch, {posX, posY});
 		x++;
-		posX += 1.0f;
+		posX += 1.0f; //go to the next column 
 	}
 }
 void init(void)
@@ -210,7 +210,7 @@ void init(void)
 	// Image loading.
 	stbi_set_flip_vertically_on_load(true);
 
-	unsigned char* image = stbi_load("rock.jpg", &width, &height, &bitDepth, 0);
+	unsigned char* image = stbi_load("dirt.png", &width, &height, &bitDepth, 0);
 	if (!image) cout << "Unable to load file!" << endl;
 
 	glGenTextures(1, &firstTx);
@@ -346,9 +346,10 @@ void init(void)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// Enable smoothing.
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POLYGON_SMOOTH);
+	/*glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);*/
 
+	
 	CreateTileMap();
 
 	timer(0);
@@ -452,10 +453,10 @@ void Turret(glm::vec2 Pos) {
 	transformObject(glm::vec3(3.0f, 4.0f, 3.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
-	/*glBindTexture(GL_TEXTURE_2D, blankTx);
+	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_cone.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(4.0f, 4.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 4.0f, Pos.y));
-	glDrawElements(GL_TRIANGLES, g_cone.NumIndices(), GL_UNSIGNED_SHORT, 0);*/
+	glDrawElements(GL_TRIANGLES, g_cone.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
 void Stairs(glm::vec2 Pos) {
@@ -491,7 +492,7 @@ void display(void)
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 	glDrawElements(GL_TRIANGLES, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
-	glBindTexture(GL_TEXTURE_2D, blankTx);
+	/*glBindTexture(GL_TEXTURE_2D, blankTx);
 	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(2.f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 0.0f, -6.0f));
 	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
@@ -505,7 +506,7 @@ void display(void)
 	glBindTexture(GL_TEXTURE_2D, secondTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.5f, 1.0f, -5.5f));
-	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);*/
 
 	
 	for(int x = 0; x < numberOfTiles; x++)
@@ -517,6 +518,21 @@ void display(void)
 			case 'C':
 				TransparentCube(tileMap[x][y].Position);
 				break;
+			case 'T':
+				Turret(tileMap[x][y].Position);
+				break;
+			case 'Z':
+				VerticalWall(tileMap[x][y].Position);
+				break;
+			case 'W':
+				HorizontalWall(tileMap[x][y].Position);
+				break;
+			case 'S':
+				Stairs(tileMap[x][y].Position);
+				break;
+			case 'M':
+				MazeWall(tileMap[x][y].Position);
+				break;	
 			default:
 				break;
 			}
