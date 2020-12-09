@@ -88,7 +88,7 @@
     <ClCompile Include="01_Lights.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="GAME2012_A5_EscobarJulian.cpp" />
+    <ClCompile Include="GAME2012_A5_Escobar_Krespi.cpp" />
     <ClCompile Include="LoadShaders.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 ﻿//***************************************************************************
-// GAME2012_A5_EscobarJulian.cpp by Julian Escobar (C) 2020 All Rights Reserved.
+// GAME2012_A5_Escobar_Krespi.cpp by Julian Escobar and Lucas Krespi dos Santos (C) 2020 All Rights Reserved.
 //
 // Assignment 5 submission.
 //
@@ -152,7 +152,7 @@ void resetView()
 Cube g_cube(1);
 Cube2 g_cubeSmall;
 Prism g_prism(24);
-Grid g_grid(20,4); // New UV scale parameter. Works with texture now.
+GridP g_grid(24,4); // New UV scale parameter. Works with texture now.
 Cone g_cone(24);
 
 
@@ -499,7 +499,7 @@ void DoorRight(glm::vec2 Pos) {
 void HorizontalWall(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	transformObject(glm::vec3(1.0f, 4.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
 	glBindTexture(GL_TEXTURE_2D, wallTx);
@@ -516,7 +516,7 @@ void HorizontalWall(glm::vec2 Pos) {
 void VerticalWall(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	transformObject(glm::vec3(1.0f, 4.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
 	glBindTexture(GL_TEXTURE_2D, wallTx);
@@ -570,7 +570,7 @@ void Ground(glm::vec2 Pos)
 {
 	glBindTexture(GL_TEXTURE_2D, firstTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
+	transformObject(glm::vec3(2.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
@@ -794,7 +794,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutSetOption(GLUT_MULTISAMPLE, 8);
 	glutInitWindowSize(800, 800);
-	glutCreateWindow("GAME2012_A5_EscobarJulian.");
+	glutCreateWindow("GAME2012_A5_Escobar_Krespi.");
 
 	glewInit();	//Initializes the glew and prepares the drawing pipeline.
 	init();
