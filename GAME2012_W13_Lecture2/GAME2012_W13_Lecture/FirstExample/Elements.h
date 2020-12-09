@@ -4,12 +4,16 @@
 class Elements
 {
 public:
+	Elements()
+	{
+		id = 'n';
+		Position = {0,0};
+	}
 	Elements(char id, glm::vec2 pos)
 	{
 		this->id = id;
 		Position = pos;
 	}
-private:
 	char id;
 	glm::vec2 Position;
 };

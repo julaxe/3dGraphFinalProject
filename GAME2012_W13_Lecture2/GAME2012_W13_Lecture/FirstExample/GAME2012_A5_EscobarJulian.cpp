@@ -16,9 +16,12 @@ using namespace std;
 #include "LoadShaders.h"
 #include "Light.h"
 #include "Shape.h"
+#include "Elements.h"
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -105,6 +108,8 @@ struct Cube2 : public Shape
 GLuint vao, ibo, points_vbo, colors_vbo, uv_vbo, normals_vbo, modelID, viewID, projID;
 GLuint program;
 
+int const numberOfTiles = 5;
+Elements tileMap[numberOfTiles][numberOfTiles];
 // Matrices.
 glm::mat4 View, Projection;
 
@@ -150,6 +155,32 @@ Prism g_prism(24);
 Grid g_grid(10,3); // New UV scale parameter. Works with texture now.
 Cone g_cone(24);
 
+
+void CreateTileMap()
+{
+	fstream fin("tilemap.txt", fstream::in);
+	int x = 0;
+	int y = 0;
+	float posX = 0.0f;
+	float posY = (float)numberOfTiles*-1.f;
+	char ch;
+	while(fin >> noskipws >> ch)
+	{
+		if(ch == '\n')
+		{
+			x = 0;
+			posX = 0.0f;
+			
+			y++;
+			posY += 1.0f;
+			continue;
+		}
+		if(x < numberOfTiles && y < numberOfTiles)
+			tileMap[x][y] = Elements(ch, {posX, posY});
+		x++;
+		posX += 1.0f;
+	}
+}
 void init(void)
 {
 	srand((unsigned)time(NULL));
@@ -318,6 +349,8 @@ void init(void)
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POLYGON_SMOOTH);
 
+	CreateTileMap();
+
 	timer(0);
 	glClearColor(0.5, 0.25, 0.0, 1.0); // black background
 }
@@ -474,7 +507,21 @@ void display(void)
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.5f, 1.0f, -5.5f));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
-	TransparentCube({0.0f,0.0f});
+	
+	for(int x = 0; x < numberOfTiles; x++)
+	{
+		for(int y = 0; y < numberOfTiles; y++)
+		{
+			switch(tileMap[x][y].id)
+			{
+			case 'C':
+				TransparentCube(tileMap[x][y].Position);
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
 	glUniform3f(glGetUniformLocation(program, "sLight.position"), sLight.position.x, sLight.position.y, sLight.position.z);
 	
