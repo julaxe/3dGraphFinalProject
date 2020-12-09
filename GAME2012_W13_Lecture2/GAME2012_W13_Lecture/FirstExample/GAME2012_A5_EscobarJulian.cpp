@@ -118,7 +118,7 @@ GLfloat pitch, yaw;
 int lastX, lastY;
 
 // Texture variables.
-GLuint firstTx, secondTx, blankTx, thirdTx;
+GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx;
 GLint width, height, bitDepth;
 
 // Light variables.
@@ -144,10 +144,11 @@ void resetView()
 }
 
 // Shapes. Recommend putting in a map
-Cube g_cube(3);
+Cube g_cube(1);
 Cube2 g_cubeSmall;
 Prism g_prism(24);
 Grid g_grid(10,3); // New UV scale parameter. Works with texture now.
+Cone g_cone(24);
 
 void init(void)
 {
@@ -238,6 +239,34 @@ void init(void)
 	glGenerateMipmap(GL_TEXTURE_2D);
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image4);
+
+	unsigned char* image5 = stbi_load("Assets/bush.jpg", &width, &height, &bitDepth, 0);
+	if (!image5) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &bushTx);
+	glBindTexture(GL_TEXTURE_2D, bushTx);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image5);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image5);
+
+	unsigned char* image6 = stbi_load("Assets/Wall.jpg", &width, &height, &bitDepth, 0);
+	if (!image6) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &wallTx);
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image6);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image6);
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
@@ -332,8 +361,9 @@ void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngl
 
 //---------------------------------------------------------------------
 //
-// display
+// Obj generator
 //
+
 void TransparentCube(glm::vec2 Pos)
 {
 	glBindTexture(GL_TEXTURE_2D, secondTx);
@@ -341,6 +371,79 @@ void TransparentCube(glm::vec2 Pos)
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
+
+void MazeWall(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, bushTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 2.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
+void HorizontalWall(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(0.5f, 0.5f, 0.1f), X_AXIS, 0.0f, glm::vec3(Pos.x+0.25, 3.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(0.5f, 0.5f, 0.1f), X_AXIS, 0.0f, glm::vec3(Pos.x+0.25, 3.0f, Pos.y+0.9));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
+void VerticalWall(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program); 
+	transformObject(glm::vec3(0.1f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, 3.0f, Pos.y + 0.25));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(0.1f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x + 0.9, 3.0f, Pos.y + 0.25));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
+void Turret(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(3.0f, 4.0f, 3.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	/*glBindTexture(GL_TEXTURE_2D, blankTx);
+	g_cone.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(4.0f, 4.0f, 4.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 4.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cone.NumIndices(), GL_UNSIGNED_SHORT, 0);*/
+}
+
+void Stairs(glm::vec2 Pos) {
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, wallTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y+0.5));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	
+}
+
+
+//---------------------------------------------------------------------
+//
+// display
+//
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -372,8 +475,6 @@ void display(void)
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
 	TransparentCube({0.0f,0.0f});
-
-	TransparentCube({3.0f,3.0f});
 
 	glUniform3f(glGetUniformLocation(program, "sLight.position"), sLight.position.x, sLight.position.y, sLight.position.z);
 	
