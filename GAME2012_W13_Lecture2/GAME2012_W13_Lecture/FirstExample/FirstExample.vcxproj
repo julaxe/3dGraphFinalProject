@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\LoadShaders.h" />
+    <ClInclude Include="Elements.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Shape.h" />
   </ItemGroup>
