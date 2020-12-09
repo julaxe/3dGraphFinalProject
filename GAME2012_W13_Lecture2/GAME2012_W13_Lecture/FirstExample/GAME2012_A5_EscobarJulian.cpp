@@ -21,7 +21,6 @@ using namespace std;
 #include "glm\gtc\matrix_transform.hpp"
 #include <iostream>
 #include <fstream>
-#include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -108,7 +107,7 @@ struct Cube2 : public Shape
 GLuint vao, ibo, points_vbo, colors_vbo, uv_vbo, normals_vbo, modelID, viewID, projID;
 GLuint program;
 
-int const numberOfTiles = 20;
+int const numberOfTiles = 24;
 Elements tileMap[numberOfTiles][numberOfTiles];
 // Matrices.
 glm::mat4 View, Projection;
@@ -123,7 +122,7 @@ GLfloat pitch, yaw;
 int lastX, lastY;
 
 // Texture variables.
-GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx, roofTileTx,testeTx, doorTx;
+GLuint firstTx, secondTx, blankTx, thirdTx, bushTx, wallTx, roofTileTx,testeTx, doorTx, doorMirrorTx;
 
 GLint width, height, bitDepth;
 
@@ -346,6 +345,21 @@ void init(void)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(image9);
 
+	unsigned char* image10 = stbi_load("Assets/door2Mirror.jpg", &width, &height, &bitDepth, 0);
+	if (!image10) cout << "Unable to load file!" << endl;
+
+	glGenTextures(1, &doorMirrorTx);
+	glBindTexture(GL_TEXTURE_2D, doorMirrorTx);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image10);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(image10);
+
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
 	// Setting ambient Light.
@@ -453,10 +467,18 @@ void TransparentCube(glm::vec2 Pos)
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
+void Grid()
+{
+	glBindTexture(GL_TEXTURE_2D, firstTx);
+	g_grid.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, -1.0f, 0.0f));
+	glDrawElements(GL_TRIANGLES, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
+
 void MazeWall(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, bushTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 2.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	transformObject(glm::vec3(1.0f, 2.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
@@ -468,7 +490,7 @@ void DoorLeft(glm::vec2 Pos) {
 }
 
 void DoorRight(glm::vec2 Pos) {
-	glBindTexture(GL_TEXTURE_2D, doorTx);
+	glBindTexture(GL_TEXTURE_2D, doorMirrorTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(3.0f, 3.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
@@ -533,15 +555,23 @@ void Turret(glm::vec2 Pos) {
 void Stairs(glm::vec2 Pos) {
 	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 1.0f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y));
+	transformObject(glm::vec3(1.0f, 1.0f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
 	glBindTexture(GL_TEXTURE_2D, wallTx);
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, 0.0f, Pos.y+0.5));
+	transformObject(glm::vec3(1.0f, 0.5f, 0.5f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y+0.5));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 
 	
+}
+
+void Ground(glm::vec2 Pos)
+{
+	glBindTexture(GL_TEXTURE_2D, firstTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, -1.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
 }
 
 
@@ -558,26 +588,8 @@ void display(void)
 
 	//glEnable(GL_DEPTH_TEST);
 
-	glBindTexture(GL_TEXTURE_2D, firstTx);
-	g_grid.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, -90.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	glDrawElements(GL_TRIANGLES, g_grid.NumIndices(), GL_UNSIGNED_SHORT, 0);
-
-	/*glBindTexture(GL_TEXTURE_2D, blankTx);
-	g_prism.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(2.f, 1.0f, 2.0f), X_AXIS, 0.0f, glm::vec3(4.0f, 0.0f, -6.0f));
-	glDrawElements(GL_TRIANGLES, g_prism.NumIndices(), GL_UNSIGNED_SHORT, 0);
 	
-	float deltatime = 1.0f/60.0f;
-	glBindTexture(GL_TEXTURE_2D, thirdTx);
-	g_cubeSmall.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(0.25f, 0.25f, 0.25f), XY_AXIS, angle += 40*deltatime, glm::vec3(5.f, 1.5f, -5.f));
-	glDrawElements(GL_TRIANGLES, g_cubeSmall.NumIndices(), GL_UNSIGNED_SHORT, 0);
-
-	glBindTexture(GL_TEXTURE_2D, secondTx);
-	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
-	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.5f, 1.0f, -5.5f));
-	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);*/
+	Grid();
 
 	
 	for(int x = 0; x < numberOfTiles; x++)
@@ -609,7 +621,10 @@ void display(void)
 				break;
 			case 'R':
 				DoorRight(tileMap[x][y].Position);
-				break;		
+				break;
+			case 'G':
+				Ground(tileMap[x][y].Position);
+				break;	
 			default:
 				break;
 			}
