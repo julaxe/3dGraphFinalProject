@@ -334,6 +334,13 @@ void transformObject(glm::vec3 scale, glm::vec3 rotationAxis, float rotationAngl
 //
 // display
 //
+void TransparentCube(glm::vec2 Pos)
+{
+	glBindTexture(GL_TEXTURE_2D, secondTx);
+	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
+	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(Pos.x, 1.0f, Pos.y));
+	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+}
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -363,6 +370,10 @@ void display(void)
 	g_cube.BufferShape(&ibo, &points_vbo, &colors_vbo, &uv_vbo, &normals_vbo, program);
 	transformObject(glm::vec3(1.0f, 1.0f, 1.0f), X_AXIS, 0.0f, glm::vec3(4.5f, 1.0f, -5.5f));
 	glDrawElements(GL_TRIANGLES, g_cube.NumIndices(), GL_UNSIGNED_SHORT, 0);
+
+	TransparentCube({0.0f,0.0f});
+
+	TransparentCube({3.0f,3.0f});
 
 	glUniform3f(glGetUniformLocation(program, "sLight.position"), sLight.position.x, sLight.position.y, sLight.position.z);
 	
