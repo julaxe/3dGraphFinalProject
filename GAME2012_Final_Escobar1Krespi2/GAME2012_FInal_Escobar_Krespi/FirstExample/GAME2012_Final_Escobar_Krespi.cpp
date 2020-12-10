@@ -1,10 +1,10 @@
 ﻿//***************************************************************************
 // GAME2012_A5_Escobar_Krespi.cpp by Julian Escobar and Lucas Krespi dos Santos (C) 2020 All Rights Reserved.
 //
-// Assignment 5 submission.
+// Final submission.
 //
 // Description:
-// Is a plane with a prism as a base and a transparent cube with another cube inside rotating, there is also a sportlight on top of everything.
+// Maze inside a castle
 //
 //*****************************************************************************
 
